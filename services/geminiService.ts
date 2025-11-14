@@ -2,11 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 
 const API_KEY = process.env.API_KEY;
 
-if (!API_KEY) {
-    throw new Error("API_KEY environment variable not set");
-}
-
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+const ai = API_KEY ? new GoogleGenAI({ apiKey: API_KEY }) : null;
 
 const systemInstruction = `Eres un asistente virtual amigable y profesional para MARLET AGUILAR, una maquillista experta en novias en Oaxaca. Tu objetivo es ayudar a las usuarias a conocer sus servicios, agendar citas y resolver dudas.
 - Los servicios principales son: Maquillaje para Novias, Cursos de Automaquillaje y Asesorías de Belleza.
@@ -15,14 +11,17 @@ const systemInstruction = `Eres un asistente virtual amigable y profesional para
 - Responde en español.`;
 
 export const askGemini = async (prompt: string): Promise<string> => {
+  if (!ai) {
+    return "Por ahora el asistente virtual está deshabilitado en la versión pública. Puedes contactarnos por WhatsApp o Instagram para agendar y resolver dudas.";
+  }
   try {
     const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
-            systemInstruction: systemInstruction,
-            temperature: 0.7,
-        }
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        systemInstruction: systemInstruction,
+        temperature: 0.7,
+      }
     });
     return response.text;
   } catch (error) {
